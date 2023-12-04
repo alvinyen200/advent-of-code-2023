@@ -1,12 +1,12 @@
 {
   "name": "advent-of-code-2023",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
+    "init-day-n": "cp -r ./default ./src/day-${file_name}",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["Advent of Code", "Advent of Code 2023"],
+  "author": "alvinyen200",
   "license": "ISC"
 }
