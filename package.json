@@ -2,6 +2,7 @@
   "name": "advent-of-code-2023",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "init-day-n": "cp -r ./default ./src/day-${file_name}",
     "test": "echo \"Error: no test specified\" && exit 1"
