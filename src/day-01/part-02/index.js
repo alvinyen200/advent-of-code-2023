@@ -22,8 +22,8 @@ import fs from 'fs';
 **/
 
 try {
-    const lines = fs.readFileSync('./example.txt', 'utf8').split('\n');
-    // const lines = fs.readFileSync('./input.txt', 'utf8').split('\n');
+    // const lines = fs.readFileSync('./example.txt', 'utf8').split('\n');
+    const lines = fs.readFileSync('./input.txt', 'utf8').split('\n');
     const calibrationValuesSum = lines.reduce((acc, curLine = '') => {
         const lettersDigitMap = {
             'one': 1,
@@ -65,6 +65,36 @@ try {
             if (indexOfFirstDigitInLetters === -1) return curLine[indexOfFirstDigitNonNaN];
             if (indexOfFirstDigitNonNaN < indexOfFirstDigitInLetters) return curLine[indexOfFirstDigitNonNaN];
             if (indexOfFirstDigitInLetters < indexOfFirstDigitNonNaN) return lettersDigitMap[firstDigitInLetters];
+        };
+
+        const findLastDigit = () => {
+            // find the last !NaN() with findLastIndex => A, the length
+            const indexOfLastDigitNonNaN = curLine.split('')
+                .findLastIndex((charOfCurLine = '') => !isNaN(charOfCurLine));
+
+            // find the last matched with any of digitsInLetters with lastIndexOf => B, the length
+            let indexOfLastDigitInLetters = -1;
+            let lastDigitInLetters = '';
+            digitsInLetters.forEach((theDigitInLetters = '') => {
+                const indexOfTheDigitInLetters = curLine.lastIndexOf(theDigitInLetters);
+                if (
+                    (indexOfTheDigitInLetters !== -1) && 
+                    (
+                        (indexOfLastDigitInLetters === -1) || 
+                        (indexOfTheDigitInLetters > indexOfLastDigitInLetters)
+                    )
+                ) {
+                    indexOfLastDigitInLetters = indexOfTheDigitInLetters;
+                    lastDigitInLetters = theDigitInLetters;
+                }
+            });
+
+            // compare A n B to find which is greather, ''
+            if (indexOfLastDigitNonNaN === -1 && indexOfLastDigitInLetters === -1) return '';
+            if (indexOfLastDigitNonNaN === -1) return lettersDigitMap[lastDigitInLetters];
+            if (indexOfLastDigitInLetters === -1) return curLine[indexOfLastDigitNonNaN];
+            if (indexOfLastDigitNonNaN > indexOfLastDigitInLetters) return curLine[indexOfLastDigitNonNaN];
+            if (indexOfLastDigitInLetters > indexOfLastDigitNonNaN) return lettersDigitMap[lastDigitInLetters];
         };
     }, 0);
 } catch (err) {
