@@ -23,6 +23,50 @@ import fs from 'fs';
 
 try {
     const lines = fs.readFileSync('./example.txt', 'utf8').split('\n');
+    // const lines = fs.readFileSync('./input.txt', 'utf8').split('\n');
+    const calibrationValuesSum = lines.reduce((acc, curLine = '') => {
+        const lettersDigitMap = {
+            'one': 1,
+            'two': 2,
+            'three': 3,
+            'four': 4,
+            'five': 5,
+            'six': 6,
+            'seven': 7,
+            'eight': 8,
+            'nine': 9
+        };
+        const digitsInLetters = Object.keys(lettersDigitMap);
+        const findFirstDigit = () => {
+            // find the first !NaN() with findIndex => A
+            const indexOfFirstDigitNonNaN = curLine.split('')
+                .findIndex((charOfCurLine = '') => !isNaN(charOfCurLine));
+
+            // find the first matched with any of digitsInLetters with indexOf => B
+            let indexOfFirstDigitInLetters = -1;
+            let firstDigitInLetters = '';
+            digitsInLetters.forEach((theDigitInLetters = '') => {
+                const indexOfTheDigitInLetters = curLine.indexOf(theDigitInLetters);
+                if (
+                    (indexOfTheDigitInLetters !== -1) && 
+                    (
+                        (indexOfFirstDigitInLetters === -1) || 
+                        (indexOfTheDigitInLetters < indexOfFirstDigitInLetters)
+                    )
+                ) {
+                    indexOfFirstDigitInLetters = indexOfTheDigitInLetters;
+                    firstDigitInLetters = theDigitInLetters;
+                }
+            });
+
+            // compare A n B to find which is smaller, ''
+            if (indexOfFirstDigitNonNaN === -1 && indexOfFirstDigitInLetters === -1) return '';
+            if (indexOfFirstDigitNonNaN === -1) return lettersDigitMap[firstDigitInLetters];
+            if (indexOfFirstDigitInLetters === -1) return curLine[indexOfFirstDigitNonNaN];
+            if (indexOfFirstDigitNonNaN < indexOfFirstDigitInLetters) return curLine[indexOfFirstDigitNonNaN];
+            if (indexOfFirstDigitInLetters < indexOfFirstDigitNonNaN) return lettersDigitMap[firstDigitInLetters];
+        };
+    }, 0);
 } catch (err) {
     console.log(err);
 }    
