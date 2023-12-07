@@ -24,79 +24,95 @@ import fs from 'fs';
 try {
     // const lines = fs.readFileSync('./example.txt', 'utf8').split('\n');
     const lines = fs.readFileSync('./input.txt', 'utf8').split('\n');
+
+    const lettersDigitMap = {
+        'one': '1',
+        'two': '2',
+        'three': '3',
+        'four': '4',
+        'five': '5',
+        'six': '6',
+        'seven': '7',
+        'eight': '8',
+        'nine': '9'
+    };
+    const digitsInLetters = Object.keys(lettersDigitMap);
+
+    const findFirstDigit = (curLine = '') => {
+        if (!curLine) throw new Error('Please specify [curLine] arg. when you apply [findFirstDigit function]');
+
+        // find the first !NaN() with findIndex => A
+        const indexOfFirstDigitNonNaN = curLine.split('')
+            .findIndex((charOfCurLine = '') => !isNaN(charOfCurLine));
+
+        // find the first matched with any of digitsInLetters with indexOf => B
+        let indexOfFirstDigitInLetters = -1;
+        let firstDigitInLetters = '';
+        digitsInLetters.forEach((theDigitInLetters = '') => {
+            const indexOfTheDigitInLetters = curLine.indexOf(theDigitInLetters);
+            if (
+                (indexOfTheDigitInLetters !== -1) && 
+                (
+                    (indexOfFirstDigitInLetters === -1) || 
+                    (indexOfTheDigitInLetters < indexOfFirstDigitInLetters)
+                )
+            ) {
+                indexOfFirstDigitInLetters = indexOfTheDigitInLetters;
+                firstDigitInLetters = theDigitInLetters;
+            }
+        });
+
+        // compare A n B to find which is smaller, ''
+        let returnValue = '';
+        if (indexOfFirstDigitNonNaN === -1 && indexOfFirstDigitInLetters === -1) returnValue = '';
+        else if (indexOfFirstDigitNonNaN === -1) returnValue = lettersDigitMap[firstDigitInLetters];
+        else if (indexOfFirstDigitInLetters === -1) returnValue = curLine[indexOfFirstDigitNonNaN];
+        else if (indexOfFirstDigitNonNaN < indexOfFirstDigitInLetters) returnValue = curLine[indexOfFirstDigitNonNaN];
+        else if (indexOfFirstDigitInLetters < indexOfFirstDigitNonNaN) returnValue = lettersDigitMap[firstDigitInLetters];
+
+        return returnValue + '';
+    };
+
+    const findLastDigit = (curLine = '') => {
+        if (!curLine) throw new Error('Please specify [curLine] arg. when you apply [findLastDigit function]');
+
+        // find the last !NaN() with findLastIndex => A, the length
+        const indexOfLastDigitNonNaN = curLine.split('')
+            .findLastIndex((charOfCurLine = '') => !isNaN(charOfCurLine));
+
+        // find the last matched with any of digitsInLetters with lastIndexOf => B, the length
+        let indexOfLastDigitInLetters = -1;
+        let lastDigitInLetters = '';
+        digitsInLetters.forEach((theDigitInLetters = '') => {
+            const indexOfTheDigitInLetters = curLine.lastIndexOf(theDigitInLetters);
+            if (
+                (indexOfTheDigitInLetters !== -1) && 
+                (
+                    (indexOfLastDigitInLetters === -1) || 
+                    (indexOfTheDigitInLetters > indexOfLastDigitInLetters)
+                )
+            ) {
+                indexOfLastDigitInLetters = indexOfTheDigitInLetters;
+                lastDigitInLetters = theDigitInLetters;
+            }
+        });
+
+        // compare A n B to find which is greather, ''
+        let returnValue = '';
+        if (indexOfLastDigitNonNaN === -1 && indexOfLastDigitInLetters === -1) returnValue = '';
+        else if (indexOfLastDigitNonNaN === -1) returnValue = lettersDigitMap[lastDigitInLetters];
+        else if (indexOfLastDigitInLetters === -1) returnValue = curLine[indexOfLastDigitNonNaN];
+        else if (indexOfLastDigitNonNaN > indexOfLastDigitInLetters) returnValue = curLine[indexOfLastDigitNonNaN];
+        else if (indexOfLastDigitInLetters > indexOfLastDigitNonNaN) returnValue = lettersDigitMap[lastDigitInLetters];
+
+        return returnValue + '';
+    };
+
     const calibrationValuesSum = lines.reduce((acc, curLine = '') => {
-        const lettersDigitMap = {
-            'one': 1,
-            'two': 2,
-            'three': 3,
-            'four': 4,
-            'five': 5,
-            'six': 6,
-            'seven': 7,
-            'eight': 8,
-            'nine': 9
-        };
-        const digitsInLetters = Object.keys(lettersDigitMap);
-        const findFirstDigit = () => {
-            // find the first !NaN() with findIndex => A
-            const indexOfFirstDigitNonNaN = curLine.split('')
-                .findIndex((charOfCurLine = '') => !isNaN(charOfCurLine));
-
-            // find the first matched with any of digitsInLetters with indexOf => B
-            let indexOfFirstDigitInLetters = -1;
-            let firstDigitInLetters = '';
-            digitsInLetters.forEach((theDigitInLetters = '') => {
-                const indexOfTheDigitInLetters = curLine.indexOf(theDigitInLetters);
-                if (
-                    (indexOfTheDigitInLetters !== -1) && 
-                    (
-                        (indexOfFirstDigitInLetters === -1) || 
-                        (indexOfTheDigitInLetters < indexOfFirstDigitInLetters)
-                    )
-                ) {
-                    indexOfFirstDigitInLetters = indexOfTheDigitInLetters;
-                    firstDigitInLetters = theDigitInLetters;
-                }
-            });
-
-            // compare A n B to find which is smaller, ''
-            if (indexOfFirstDigitNonNaN === -1 && indexOfFirstDigitInLetters === -1) return '';
-            if (indexOfFirstDigitNonNaN === -1) return lettersDigitMap[firstDigitInLetters];
-            if (indexOfFirstDigitInLetters === -1) return curLine[indexOfFirstDigitNonNaN];
-            if (indexOfFirstDigitNonNaN < indexOfFirstDigitInLetters) return curLine[indexOfFirstDigitNonNaN];
-            if (indexOfFirstDigitInLetters < indexOfFirstDigitNonNaN) return lettersDigitMap[firstDigitInLetters];
-        };
-
-        const findLastDigit = () => {
-            // find the last !NaN() with findLastIndex => A, the length
-            const indexOfLastDigitNonNaN = curLine.split('')
-                .findLastIndex((charOfCurLine = '') => !isNaN(charOfCurLine));
-
-            // find the last matched with any of digitsInLetters with lastIndexOf => B, the length
-            let indexOfLastDigitInLetters = -1;
-            let lastDigitInLetters = '';
-            digitsInLetters.forEach((theDigitInLetters = '') => {
-                const indexOfTheDigitInLetters = curLine.lastIndexOf(theDigitInLetters);
-                if (
-                    (indexOfTheDigitInLetters !== -1) && 
-                    (
-                        (indexOfLastDigitInLetters === -1) || 
-                        (indexOfTheDigitInLetters > indexOfLastDigitInLetters)
-                    )
-                ) {
-                    indexOfLastDigitInLetters = indexOfTheDigitInLetters;
-                    lastDigitInLetters = theDigitInLetters;
-                }
-            });
-
-            // compare A n B to find which is greather, ''
-            if (indexOfLastDigitNonNaN === -1 && indexOfLastDigitInLetters === -1) return '';
-            if (indexOfLastDigitNonNaN === -1) return lettersDigitMap[lastDigitInLetters];
-            if (indexOfLastDigitInLetters === -1) return curLine[indexOfLastDigitNonNaN];
-            if (indexOfLastDigitNonNaN > indexOfLastDigitInLetters) return curLine[indexOfLastDigitNonNaN];
-            if (indexOfLastDigitInLetters > indexOfLastDigitNonNaN) return lettersDigitMap[lastDigitInLetters];
-        };
+        return acc + Number(findFirstDigit(curLine) + findLastDigit(curLine));
     }, 0);
+
+    console.log(calibrationValuesSum);
 } catch (err) {
     console.log(err);
 }    
