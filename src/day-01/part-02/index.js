@@ -11,14 +11,10 @@ import fs from 'fs';
     - i.e. const lines = fs.readFileSync('./example.txt', 'utf8').split('\n');
 
     ## Note 2. The thought of the problem of part-02
-    - find the first digit
-    -- find the first !NaN() with findIndex => A, -1
-    -- find the first matched with any of digitsInLetters with indexOf => B, -1
-    -- compare A n B to find which is smaller, ''
-    - find the last digit
-    -- find the last !NaN() with findLastIndex => A, the length
-    -- find the last matched with any of digitsInLetters with lastIndexOf => B, the length
-    -- compare A n B to find which is greater, ''
+    - find the first/last digit
+    -- find the first/last !NaN() with findIndex/findLastIndex => A, -1
+    -- find the first/last matched with any of digitsInLetters with indexOf/lastIndexOf => B, -1
+    -- compare A n B to find which is smaller/greater, ''
 **/
 
 try {
@@ -38,78 +34,72 @@ try {
     };
     const digitsInLetters = Object.keys(lettersDigitMap);
 
-    const findFirstDigit = (curLine = '') => {
-        if (!curLine) throw new Error('Please specify [curLine] arg. when you apply [findFirstDigit function]');
+    const findTargetDigit = (curLine = '', isFindFirstDigit) => {
+        if (!curLine) throw new Error('Please specify [curLine] arg. when you apply [findTargetDigit function]');
+        if (isFindFirstDigit === undefined) throw new Error('Please specify [isFindFirstDigit] arg. when you apply [findTargetDigit function]');
 
-        // find the first !NaN() with findIndex => A
-        const indexOfFirstDigitNonNaN = curLine.split('')
-            .findIndex((charOfCurLine = '') => !isNaN(charOfCurLine));
+        // find the first/last !NaN() with findIndex/findLastIndex => A
+        const curLineInChars = curLine.split('');
+        let indexOfTargetDigitNonNaN = -1;
+        if (isFindFirstDigit) {
+            indexOfTargetDigitNonNaN = curLineInChars.findIndex((char = '') => !isNaN(char));
+        } else {
+            indexOfTargetDigitNonNaN = curLineInChars.findLastIndex((char = '') => !isNaN(char));
+        }
 
-        // find the first matched with any of digitsInLetters with indexOf => B
-        let indexOfFirstDigitInLetters = -1;
-        let firstDigitInLetters = '';
+        // find the first/last matched with any of digitsInLetters with indexOf/lastIndexOf => B
+        let indexOfTargetDigitInLetters = -1;
+        let targetDigitInLetters = '';
         digitsInLetters.forEach((theDigitInLetters = '') => {
-            const indexOfTheDigitInLetters = curLine.indexOf(theDigitInLetters);
-            if (
-                (indexOfTheDigitInLetters !== -1) && 
-                (
-                    (indexOfFirstDigitInLetters === -1) || 
-                    (indexOfTheDigitInLetters < indexOfFirstDigitInLetters)
-                )
-            ) {
-                indexOfFirstDigitInLetters = indexOfTheDigitInLetters;
-                firstDigitInLetters = theDigitInLetters;
+            let indexOfTheDigitInLetters = -1;
+            if (isFindFirstDigit) {
+                indexOfTheDigitInLetters = curLine.indexOf(theDigitInLetters);
+            } else {
+                indexOfTheDigitInLetters = curLine.lastIndexOf(theDigitInLetters);
+            }
+
+            if (indexOfTheDigitInLetters !== -1) {
+                if (isFindFirstDigit) {
+                    if (
+                        (indexOfTargetDigitInLetters === -1) || 
+                        (indexOfTheDigitInLetters < indexOfTargetDigitInLetters)
+                    ) {
+                        indexOfTargetDigitInLetters = indexOfTheDigitInLetters;
+                        targetDigitInLetters = theDigitInLetters;
+                    }
+                } else {
+                    if (
+                        (indexOfTargetDigitInLetters === -1) || 
+                        (indexOfTheDigitInLetters > indexOfTargetDigitInLetters)
+                    ) {
+                        indexOfTargetDigitInLetters = indexOfTheDigitInLetters;
+                        targetDigitInLetters = theDigitInLetters;
+                    }
+                }
             }
         });
 
-        // compare A n B to find which is smaller, ''
+        // compare A n B to find which is smaller/greather, ''
         let returnValue = '';
-        if (indexOfFirstDigitNonNaN === -1 && indexOfFirstDigitInLetters === -1) returnValue = '';
-        else if (indexOfFirstDigitNonNaN === -1) returnValue = lettersDigitMap[firstDigitInLetters];
-        else if (indexOfFirstDigitInLetters === -1) returnValue = curLine[indexOfFirstDigitNonNaN];
-        else if (indexOfFirstDigitNonNaN < indexOfFirstDigitInLetters) returnValue = curLine[indexOfFirstDigitNonNaN];
-        else if (indexOfFirstDigitInLetters < indexOfFirstDigitNonNaN) returnValue = lettersDigitMap[firstDigitInLetters];
-
-        return returnValue + '';
-    };
-
-    const findLastDigit = (curLine = '') => {
-        if (!curLine) throw new Error('Please specify [curLine] arg. when you apply [findLastDigit function]');
-
-        // find the last !NaN() with findLastIndex => A, the length
-        const indexOfLastDigitNonNaN = curLine.split('')
-            .findLastIndex((charOfCurLine = '') => !isNaN(charOfCurLine));
-
-        // find the last matched with any of digitsInLetters with lastIndexOf => B, the length
-        let indexOfLastDigitInLetters = -1;
-        let lastDigitInLetters = '';
-        digitsInLetters.forEach((theDigitInLetters = '') => {
-            const indexOfTheDigitInLetters = curLine.lastIndexOf(theDigitInLetters);
-            if (
-                (indexOfTheDigitInLetters !== -1) && 
-                (
-                    (indexOfLastDigitInLetters === -1) || 
-                    (indexOfTheDigitInLetters > indexOfLastDigitInLetters)
-                )
-            ) {
-                indexOfLastDigitInLetters = indexOfTheDigitInLetters;
-                lastDigitInLetters = theDigitInLetters;
-            }
-        });
-
-        // compare A n B to find which is greather, ''
-        let returnValue = '';
-        if (indexOfLastDigitNonNaN === -1 && indexOfLastDigitInLetters === -1) returnValue = '';
-        else if (indexOfLastDigitNonNaN === -1) returnValue = lettersDigitMap[lastDigitInLetters];
-        else if (indexOfLastDigitInLetters === -1) returnValue = curLine[indexOfLastDigitNonNaN];
-        else if (indexOfLastDigitNonNaN > indexOfLastDigitInLetters) returnValue = curLine[indexOfLastDigitNonNaN];
-        else if (indexOfLastDigitInLetters > indexOfLastDigitNonNaN) returnValue = lettersDigitMap[lastDigitInLetters];
-
+        if (isFindFirstDigit) {
+            if (indexOfTargetDigitNonNaN === -1 && indexOfTargetDigitInLetters === -1) returnValue = '';
+            else if (indexOfTargetDigitNonNaN === -1) returnValue = lettersDigitMap[targetDigitInLetters];
+            else if (indexOfTargetDigitInLetters === -1) returnValue = curLine[indexOfTargetDigitNonNaN];
+            else if (indexOfTargetDigitNonNaN < indexOfTargetDigitInLetters) returnValue = curLine[indexOfTargetDigitNonNaN];
+            else if (indexOfTargetDigitInLetters < indexOfTargetDigitNonNaN) returnValue = lettersDigitMap[targetDigitInLetters];
+        } else {
+            if (indexOfTargetDigitNonNaN === -1 && indexOfTargetDigitInLetters === -1) returnValue = '';
+            else if (indexOfTargetDigitNonNaN === -1) returnValue = lettersDigitMap[targetDigitInLetters];
+            else if (indexOfTargetDigitInLetters === -1) returnValue = curLine[indexOfTargetDigitNonNaN];
+            else if (indexOfTargetDigitNonNaN > indexOfTargetDigitInLetters) returnValue = curLine[indexOfTargetDigitNonNaN];
+            else if (indexOfTargetDigitInLetters > indexOfTargetDigitNonNaN) returnValue = lettersDigitMap[targetDigitInLetters];
+        }
+        
         return returnValue + '';
     };
 
     const calibrationValuesSum = lines.reduce((acc, curLine = '') => {
-        return acc + Number(findFirstDigit(curLine) + findLastDigit(curLine));
+        return acc + Number(findTargetDigit(curLine, true) + findTargetDigit(curLine, false));
     }, 0);
 
     console.log(calibrationValuesSum);
