@@ -10,22 +10,21 @@ import fs from 'fs';
         - const gameId:number = Number(gameIdString.split(' ')[1]);
         - split the leftString:string by ';' and make it as cubeSets:string[] (each ele. would be like ' 3 blue, 4 red')
 
-        - let isCubeSetValid = true;
-        - forEach cubeSets:string[] (each ele. would be like ' 3 blue, 4 red')
+        - const isAllCubeSetsValid:boolean = Array.every cubeSets:string[] (each ele. would be like ' 3 blue, 4 red')
             - split cubeSet:string with ',' and make it as cubesInColors:string[] (each ele. would be like ' 3 blue')
-            - Array.every cubesInColors:string[] (each ele. would be like ' 3 blue')
+            - const isAllCubesInColorsValid:boolean = Array.every cubesInColors:string[] (each ele. would be like ' 3 blue')
                 - split the string with ' ', and make the 2nd elm as countOfColor, the 3rd as color
                     - i.e. [ '', '2', 'green' ]
                 - check if countOfColor > maxLimitOfEachColorInEachSubset[color]
-                    - if so
-                        - isCubeSetValid = false;
-                        - return false to break this Array.every
-                    - if not 
-                        - return ture to keep this Array.every
-        - if (
-            isCubeSetValid
-        ) {
-            sumOfResult += gameId;
+                    - if so, return false (to break this Array.every)
+                - outside of the check means passing the (last) check
+                    - return true;
+            - if (!isAllCubesInColorsValid) {
+                return false;
+            }
+            - return true;
+        - if (isAllCubeSetsValid) {
+            sumOfResult += Number(gameId);
         }
     - return sumOfResult;
 **/
@@ -40,20 +39,24 @@ try {
         const [gameIdString, leftString] = line.split(':');
         const gameId = gameIdString.split(' ')[1];
         const cubeSets = leftString.split(';');
-        let isCubeSetValid = true;
-        cubeSets.forEach((cubeSet = '') => {
+        let isAllCubeSetsValid = cubeSets.every((cubeSet = '') => {
             const cubesInColors = cubeSet.split(',');
-            cubesInColors.every((cubesInColor = '') => {
+            const isAllCubesInColorsValid = cubesInColors.every((cubesInColor = '') => {
                 const [, countOfColor, color] = cubesInColor.split(' ');
+
                 if (countOfColor > maxLimitOfEachColorInEachSubset[color]) {
-                    isCubeSetValid = false;
                     return false;
                 }
                 return true;
             });
+
+            if (!isAllCubesInColorsValid) {
+                return false;
+            }
+            return true;
         });
 
-        if (isCubeSetValid) {
+        if (isAllCubeSetsValid) {
             sumOfResult += Number(gameId);
         }
     });
